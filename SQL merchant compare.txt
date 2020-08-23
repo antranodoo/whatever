@@ -1,0 +1,18 @@
+ Select case when mcp.merchant_order_id is null then scp.sub_merchant_order_id else mcp.merchant_order_id end as order_id, merchant_amount_total as partner_amount, amount_total as sale_amount
+                from
+                (Select merchant_order_id, merchant_amount_total 
+                from sub_merchant_transaction 
+                where create_date >= '2020-08-14' 
+                except 
+                select sub_merchant_order_id, amount_total 
+                from sale_order 
+                where create_date >= '2020-08-14') mcp
+			full outer join 
+            (select sub_merchant_order_id, amount_total 
+            from sale_order 
+            where user_id in (375,795) and create_date >= '2020-08-14' 
+            except 
+            select merchant_order_id, merchant_amount_total 
+            from sub_merchant_transaction 
+            where create_date >= '2020-08-14') scp
+            on mcp.merchant_order_id = scp.sub_merchant_order_id
